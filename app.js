@@ -10,66 +10,89 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
-//variables//
-let mapEvent;
-let map;
 
-///Geolocation
-if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(function(position){
+
+///UI Architecture
+class App{
+    #map;  ///Prviate Instance Properties of Current Object
+    #mapEvent;  ///Prviate Instance Properties of Current Object
+    constructor(){
+        this._getPosition();
+        form.addEventListener('submit',this._newWorkout.bind(this) ); //this points to the form in the Event listener.//
+
+        //Toggle b/w running and cycling
+        inputType.addEventListener('change',this._toggleElevationField);
+        
+        
+        
+    }
+    _getPosition(){
+       ///Geolocation
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(
+        this._loadMap.bind(this),function(){
+            alert('Colud not get the Position')
+        })
+    }
+ 
+    }
+
+    _loadMap(position){
+        
         console.log(position)
         const {latitude} = position.coords;
         const {longitude} = position.coords;
 
-         map = L.map('map').setView([latitude, longitude], 13);
+        this.#map = L.map('map').setView([latitude, longitude], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        }).addTo(this.#map);
 
-        map.on('click',function(mapE){
-            mapEvent = mapE;
-            form.classList.remove('hidden');
-            inputDuration.focus();
-        })
+        this.#map.on('click',this._showForm.bind(this));
 
+    }
+
+    _showForm(mapE){
+        this.#mapEvent = mapE;
+        form.classList.remove('hidden');
+        inputDuration.focus();
+    }
+
+    _toggleElevationField(e){
+        e.preventDefault();
+
+        inputElevation.parentElement.classList.toggle('form__row--hidden');
+        inputCadence.parentElement.classList.toggle('form__row--hidden');
+       
+    }
+
+    _newWorkout(e){
         
+         //clearfields//
+         inputDistance.value = inputCadence.value = inputDuration.value = inputElevation.value = '';
         
-    },function(){
-        alert('Colud not get the Position')
-    })
+         e.preventDefault();
+         console.log(this);
+         const {lat,lng}=this.#mapEvent.latlng;
+         L.marker([lat,lng])
+         .addTo(this.#map).bindPopup(L.popup(
+             {
+                 maxWidth:300,
+                 minWidth:50,
+                 autoClose:false,
+                 closeOnClick:false,
+                 className:'running-popup'
+     
+             }
+         ))
+         .setPopupContent('Workout')
+         .openPopup();
+    }
 }
 
-form.addEventListener('submit',function(e){
+const app = new App;
 
-    //clearfields//
-    inputDistance.value = inputCadence.value = inputDuration.value = inputElevation.value = '';
 
-    e.preventDefault();
-    console.log(mapEvent);
-    const {lat,lng}=mapEvent.latlng;
-    L.marker([lat,lng])
-    .addTo(map).bindPopup(L.popup(
-       {
-           maxWidth:300,
-           minWidth:50,
-           autoClose:false,
-           closeOnClick:false,
-           className:'running-popup'
 
-        }
-   ))
-   .setPopupContent('Workout')
-   .openPopup();
 
-   
-})
-
-//Toggle b/w running and cycling
-inputType.addEventListener('change',function(e){
-    e.preventDefault();
-
-    inputElevation.parentElement.classList.toggle('form__row--hidden');
-    inputCadence.parentElement.classList.toggle('form__row--hidden');
-
-})
