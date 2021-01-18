@@ -11,21 +11,46 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
 
+///Data Storing Architecture//
+
+//main class
+class Workout{
+    //modern js still not yet official in js//
+    date = new Date();
+    id = (Date.now() + '').slice(-10);
+
+    //common properties///
+    constructor(coords,distance,duration){
+        this.coords = coords;
+        this.distance = distance; //in km
+        this.duration = duration; // in min
+    }
+}
+
+//child class
+class Running extends Workout{
+
+}
+
+//child class//
+class Running extends Workout{
+
+}
 
 ///UI Architecture
 class App{
-    #map;  ///Prviate Instance Properties of Current Object
-    #mapEvent;  ///Prviate Instance Properties of Current Object
+    #map;  ///Prviate Instance Properties of Current Object used instead of defining the variable in global scope
+    #mapEvent;  ///Prviate Instance Properties of Current Object used instead of defining the variable in global scope
     constructor(){
         this._getPosition();
         form.addEventListener('submit',this._newWorkout.bind(this) ); //this points to the form in the Event listener.//
 
         //Toggle b/w running and cycling
         inputType.addEventListener('change',this._toggleElevationField);
-        
-        
-        
     }
+
+
+    ///get positon from geolocation method
     _getPosition(){
        ///Geolocation
     if(navigator.geolocation){
@@ -37,6 +62,7 @@ class App{
  
     }
 
+    ///loading map using leaflet open source lib
     _loadMap(position){
         
         console.log(position)
@@ -53,12 +79,15 @@ class App{
 
     }
 
+
+    //removing the hidden class to show form//
     _showForm(mapE){
         this.#mapEvent = mapE;
         form.classList.remove('hidden');
         inputDuration.focus();
     }
 
+    //toggle b/w cycling and running
     _toggleElevationField(e){
         e.preventDefault();
 
@@ -91,6 +120,8 @@ class App{
     }
 }
 
+
+///Creating a new Object
 const app = new App;
 
 
