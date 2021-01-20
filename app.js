@@ -29,13 +29,36 @@ class Workout{
 
 //child class
 class Running extends Workout{
+    constructor(coords,distance,duration,cadence){
+        super(coords,distance,duration);
+        this.cadence = cadence;
+        this.calPace;
+    }
 
+    calPace(){
+        this.pace = this.duration / this.distance;
+    }
 }
 
 //child class//
-class Running extends Workout{
-
+class Cycling extends Workout{
+    constructor(coords,distance,duration,elevationGain){
+        super(coords,distance,duration);
+        this.elevationGain = elevationGain;
+        this.calSpeed;
+    } 
+    
+    calSpeed(){
+        this.speed = this.distance / (this.duration/60);
+    }
 }
+
+//Instantiating///
+// const workout = new Workout;
+const run = new Running([39,-12],5.2,24,178);
+const cyc = new Cycling([39,-12],5.2,24,178);
+
+console.log(run,cyc);
 
 ///UI Architecture
 class App{
@@ -97,11 +120,63 @@ class App{
     }
 
     _newWorkout(e){
+        e.preventDefault();
+
+        ///validating//
+        const validInputs = (...inputs)=> inputs.every(inp=> Number.isFinite(inp));
+        console.log(validInputs);
+        const allPositive = (...inputs)=> inputs.every(inp => inp > 0);
+        
+
+        ///Get Data from UI form//
+        const input = inputType.value;
+        console.log(input);
+        const distance = inputDistance.value;
+        console.log(distance);
+        const duration = inputDuration.value;
+        console.log(duration);
+       
+        //If activity Running , create running object///
+
+        if(input.value === 'running'){
+            const cadence = inputCadence.value;
+
+            if(
+                !validInputs(distance,duration,cadence) ||  !allPositive(distance,duration,cadence) 
+            )
+            return alert('Values need to be Positive numbers');
+        }
+
+        ////If activity cycling , create cycling object//
+        if(input.value === 'cycling'){
+            const elevation = inputElevation.value;
+            if(
+                !validInputs(distance,duration,elevation) ||  !allPositive(distance,duration) 
+            )
+            return alert('Values need to be Positive numbers');
+        }
+
+        ///Add new Object to Workout array///
+
+
+        /// Render Workout on map as a marker///
+
+
+        ////Render Workout on the List//
+
+
+
+        ///Hide Form + Clear inputs///
+
+
+
+
+
         
          //clearfields//
          inputDistance.value = inputCadence.value = inputDuration.value = inputElevation.value = '';
         
-         e.preventDefault();
+         
          console.log(this);
          const {lat,lng}=this.#mapEvent.latlng;
          L.marker([lat,lng])
@@ -126,4 +201,28 @@ const app = new App;
 
 
 
+
+
+
+// ///Rest and Spread///
+
+
+// ///spread
+
+
+// let beer = ['KingFisher','Budweieser','Corona'];
+// let beer2 = ['Aravind',25,'Murugan' ,beer];
+
+// myFunc(...beer2)
+
+// function myFunc(firstname,age,lastname,beerlist){
+//     console.log(`${firstname} ${lastname} is just ${age} and he fucking likes these ${beerlist} beers`)
+// }
+
+// ///Rest//
+//  myFunc2('Ram' ,'Kumar',22, beer2);
+
+//  function myFunc2(firstname,lastname,age,...beers){
+//     beers.forEach((beer,index)=>console.log(beer,index))
+//  }
 
